@@ -22,6 +22,12 @@
         <completion.contributor language="yaml" implementationClass="com.baiguiren.yaml.YamlCompletionContributor"/>
     </extensions>
 
+    <application-components>
+        <component>
+            <implementation-class>com.baiguiren.yaml.YamlApplicationComponent</implementation-class>
+        </component>
+    </application-components>
+
     <actions>
         <!-- Add your actions here -->
     </actions>

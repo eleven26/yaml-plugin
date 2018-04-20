@@ -16,9 +16,16 @@ import java.util.Map;
 
 public class YamlCompletionContributor extends CompletionContributor {
 
+    private static HashMap<String, String> fields;
+
+    private static HashMap<String, String> keywordMap;
+
+    public YamlCompletionContributor() {
+        keywordMap = getKeywords();
+    }
+
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
-        HashMap<String, String> keywordMap = getKeywords();
         HashMap<String, String> fieldsMap = getAllFields();
         HashMap<String, String> map = new HashMap<>();
 
@@ -55,28 +62,39 @@ public class YamlCompletionContributor extends CompletionContributor {
         }
     }
 
+    /**
+     * 在 ApplicationComponent 里面实现脏检查, 不用每次都读取文件
+     * 只有初始化或者文件发生变化的时候才去读取文件
+     * @return HashMap<String, String>
+     */
     private static HashMap<String, String> getAllFields() {
-        Project project = ProjectManager.getInstance().getOpenProjects()[0];
+        if (fields == null || YamlApplicationComponent.dirty) {
+            Project project = ProjectManager.getInstance().getOpenProjects()[0];
 
-        HashMap<String, String> map = new HashMap<>();
+            HashMap<String, String> map = new HashMap<>();
 
-        String basePath = project.getBasePath();
-        File file = new File(basePath + "/code-gen/fields.txt");
-        if (file.exists()) {
-            try {
-                InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
-                BufferedReader bufferedReader = new BufferedReader(reader);
-                String line;
-                while ((line = bufferedReader.readLine()) != null) {
-                    line = line.replace("\n", "");
-                    map.put(line, "_field");
+            String basePath = project.getBasePath();
+            File file = new File(basePath + "/code-gen/fields.txt");
+            if (file.exists()) {
+                try {
+                    InputStreamReader reader = new InputStreamReader(new FileInputStream(file));
+                    BufferedReader bufferedReader = new BufferedReader(reader);
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        line = line.replace("\n", "");
+                        map.put(line, "_field");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
             }
-        }
+            fields = map;
+            YamlApplicationComponent.dirty = false;
 
-        return map;
+            return map;
+        } else {
+            return fields;
+        }
     }
 
     private static HashMap<String, String> getKeywords() {
