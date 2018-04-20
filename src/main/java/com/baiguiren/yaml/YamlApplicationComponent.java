@@ -38,10 +38,7 @@ public class YamlApplicationComponent implements ApplicationComponent, BulkFileL
     @Override
     public void after(@NotNull List<? extends VFileEvent> events) {
         for (VFileEvent event : events) {
-            String path = event.getPath();
-            if (path.endsWith("code-gen/fields.txt")) {
-                dirty = true;
-            }
+            dirty = event.getPath().endsWith("code-gen/fields.txt");
         }
     }
 }
