@@ -16,7 +16,13 @@ apply plugin: 'java'
 
 intellij {
     plugins 'yaml'
-    pluginName 'Yaml Plugin'
+    pluginName 'Yaml Completion'
+    version ideaVersion
+
+    patchPluginXml {
+        sinceBuild '173'
+        untilBuild '181.*'
+    }
 }
 
 group 'com.baiguiren'
