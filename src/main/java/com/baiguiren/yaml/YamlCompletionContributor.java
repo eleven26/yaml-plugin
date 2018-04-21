@@ -103,6 +103,12 @@ public class YamlCompletionContributor extends CompletionContributor {
         keywordMap.put("search_placeholder", "列表搜索框placeholder");
         keywordMap.put("required_fields", "必填字段(用于表单验证)");
 
+        keywordMap.put("passwords", "密码字段");
+        keywordMap.put("radios", "单选类型字段");
+        keywordMap.put("checkboxes", "复选类型字段");
+        keywordMap.put("images", "图片上传字段");
+        keywordMap.put("textareas", "textarea 类型字段");
+
         return keywordMap;
     }
 }
