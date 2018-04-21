@@ -1,7 +1,7 @@
 <idea-plugin>
     <id>com.baiguiren.yaml</id>
     <name>yaml补全插件</name>
-    <vendor email="rubymay21s@gmail.com" url="https://www.cnblogs.com/eleven24/">eleven24</vendor>
+    <vendor email="rubymay21s@gmail.com" url="https://github.com/eleven26/yaml-plugin">eleven24</vendor>
 
     <depends>com.intellij.modules.lang</depends>
     <depends>org.jetbrains.plugins.yaml</depends>

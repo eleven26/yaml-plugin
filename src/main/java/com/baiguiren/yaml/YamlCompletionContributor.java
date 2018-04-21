@@ -6,8 +6,6 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementPresentation;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
@@ -16,9 +14,11 @@ import java.util.Map;
 
 public class YamlCompletionContributor extends CompletionContributor {
 
-    private static HashMap<String, String> fields;
-
+    // 固定的 yaml 关键字
     private static HashMap<String, String> keywordMap;
+
+    // 保存每个 project 的 fields, 特定关键字
+    private static HashMap<String, HashMap<String, String>> projectFields = new HashMap<>();
 
     public YamlCompletionContributor() {
         keywordMap = getKeywords();
@@ -26,7 +26,7 @@ public class YamlCompletionContributor extends CompletionContributor {
 
     @Override
     public void fillCompletionVariants(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
-        HashMap<String, String> fieldsMap = getAllFields();
+        HashMap<String, String> fieldsMap = getAllFields(parameters);
         HashMap<String, String> map = new HashMap<>();
 
         map.putAll(keywordMap);
@@ -67,13 +67,13 @@ public class YamlCompletionContributor extends CompletionContributor {
      * 只有初始化或者文件发生变化的时候才去读取文件
      * @return HashMap<String, String>
      */
-    private static HashMap<String, String> getAllFields() {
-        if (fields == null || YamlApplicationComponent.dirty) {
-            Project project = ProjectManager.getInstance().getOpenProjects()[0];
+    private static HashMap<String, String> getAllFields(CompletionParameters parameters) {
+        String basePath = parameters.getEditor().getProject().getBasePath();
+        String projectName = parameters.getEditor().getProject().getName();
 
+        if (projectFields.get(projectName) == null || YamlApplicationComponent.projectIsDirty(projectName)) {
             HashMap<String, String> map = new HashMap<>();
 
-            String basePath = project.getBasePath();
             File file = new File(basePath + "/code-gen/fields.txt");
             if (file.exists()) {
                 try {
@@ -88,13 +88,11 @@ public class YamlCompletionContributor extends CompletionContributor {
                     e.printStackTrace();
                 }
             }
-            fields = map;
-            YamlApplicationComponent.dirty = false;
-
-            return map;
-        } else {
-            return fields;
+            projectFields.put(projectName, map);
+            YamlApplicationComponent.dirtyProjects.remove(projectName);
         }
+
+        return projectFields.get(projectName);
     }
 
     private static HashMap<String, String> getKeywords() {

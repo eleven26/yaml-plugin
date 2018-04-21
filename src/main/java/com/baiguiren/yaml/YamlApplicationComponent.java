@@ -8,11 +8,13 @@ import com.intellij.openapi.vfs.newvfs.events.VFileEvent;
 import com.intellij.util.messages.MessageBusConnection;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashSet;
 import java.util.List;
 
 public class YamlApplicationComponent implements ApplicationComponent, BulkFileListener {
 
-    public static Boolean dirty = false;
+    @SuppressWarnings("WeakerAccess")
+    public static HashSet<String > dirtyProjects = new HashSet<>();
 
     private final MessageBusConnection connection;
 
@@ -38,7 +40,30 @@ public class YamlApplicationComponent implements ApplicationComponent, BulkFileL
     @Override
     public void after(@NotNull List<? extends VFileEvent> events) {
         for (VFileEvent event : events) {
-            dirty = event.getPath().endsWith("code-gen/fields.txt");
+            if (isLaravelProjectEvent(event)) {
+                String projectName = getProjectName(event);
+                if (!projectName.equals("")) {
+                    dirtyProjects.add(projectName);
+                }
+            }
         }
+    }
+
+    private boolean isLaravelProjectEvent(VFileEvent event) {
+        return event.getPath().endsWith("code-gen/fields.txt");
+    }
+
+    private String getProjectName(VFileEvent event) {
+        String[] paths = event.getPath().split("/");
+        if (paths.length > 3) {
+            return paths[paths.length - 3];
+        }
+
+        return "";
+    }
+
+    @SuppressWarnings("WeakerAccess")
+    public static boolean projectIsDirty(String projectName) {
+        return dirtyProjects.contains(projectName);
     }
 }
