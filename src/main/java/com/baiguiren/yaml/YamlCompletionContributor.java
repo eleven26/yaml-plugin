@@ -102,12 +102,16 @@ public class YamlCompletionContributor extends CompletionContributor {
         keywordMap.put("search_fields", "搜索字段(数组或字符串)");
         keywordMap.put("search_placeholder", "列表搜索框placeholder");
         keywordMap.put("required_fields", "必填字段(用于表单验证)");
+        keywordMap.put("form_type", "表单类型(dialog或者空)");
 
         keywordMap.put("passwords", "密码字段");
         keywordMap.put("radios", "单选类型字段");
         keywordMap.put("checkboxes", "复选类型字段");
         keywordMap.put("images", "图片上传字段");
         keywordMap.put("textareas", "textarea 类型字段");
+
+        keywordMap.put("start_index", "单选, 多选值开始的索引");
+        keywordMap.put("values", "单选, 多选的 label");
 
         return keywordMap;
     }
